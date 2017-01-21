@@ -1,0 +1,13 @@
+config BR2_PACKAGE_OSTREE
+	bool "ostree"
+	depends on BR2_PACKAGE_LIBGLIB2 
+	depends on BR2_PACKAGE_XZ
+	depends on BR2_PACKAGE_E2FSPROGS
+	depends on BR2_PACKAGE_LIBARCHIVE
+	depends on BR2_PACKAGE_LIBSOUP
+	depends on BR2_PACKAGE_LIBGPGME
+	depends on BR2_PACKAGE_LIBFUSE
+	help
+	  A simple program to rotate logs.
+
+	  https://fedorahosted.org/logrotate/
