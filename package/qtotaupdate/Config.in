@@ -1,0 +1,4 @@
+config BR2_PACKAGE_QTOTAUPDATE
+        bool "Qt OTA update"
+        help
+          Build Qt OTA update lib.
