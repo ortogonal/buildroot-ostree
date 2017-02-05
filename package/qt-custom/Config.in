@@ -1,0 +1,4 @@
+config BR2_PACKAGE_QT_CUSTOM
+        bool "Qt (Custom LDC build)"
+        help
+          Our own repository using Qt5
