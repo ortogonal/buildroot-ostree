@@ -1,0 +1,64 @@
+diff -Nur uboot-2016.11.orig/include/config_distro_bootcmd.h uboot-2016.11/include/config_distro_bootcmd.h
+--- uboot-2016.11.orig/include/config_distro_bootcmd.h	2017-01-27 05:06:06.895667332 +0100
++++ uboot-2016.11/include/config_distro_bootcmd.h	2017-02-01 13:56:52.625171253 +0100
+@@ -344,6 +344,30 @@
+ 			"echo SCRIPT FAILED: continuing...; "             \
+ 		"fi\0"                                                    \
+ 	\
++	"boot_a_ostree="                                                  \
++		"load ${devtype} ${devnum}:${distro_bootpart} "           \
++			"${scriptaddr} ${prefix}loader/uEnv.txt; "              \
++		"env import -t ${scriptaddr} ${filesize};"              \
++		"load ${devtype} ${devnum}:${distro_bootpart} "           \
++			"${kernel_addr_r} ${prefix}${kernel_image}; "              \
++		"load ${devtype} ${devnum}:${distro_bootpart} "           \
++			"${ramdisk_addr_r} ${prefix}${ramdisk_image};"              \
++		"load ${devtype} ${devnum}:${distro_bootpart} "           \
++			"${fdt_addr_r} ${prefix}vexpress-v2p-ca9.dtb;"              \
++		"setenv bootargs console=${console} ${bootargs};"\
++		"bootz ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r};\0" \
++	\
++	"scan_dev_for_uenv="                                           \
++		"echo Scanning for uEnv.txt ${devtype} ${devnum}:${distro_bootpart} ${prefix}loader/uEnv.txt ;" \
++		"if test -e ${devtype} "                                  \
++				"${devnum}:${distro_bootpart} "   \
++				"${prefix}loader/uEnv.txt; then "       \
++			"echo Found U-Boot uEnv.txt "               \
++				"${prefix}loader/uEnv.txt; "            \
++			"run boot_a_ostree; "                     \
++			"echo SCRIPT FAILED: continuing...; "     \
++		"fi\0"                                            \
++	\
+ 	"boot_a_script="                                                  \
+ 		"load ${devtype} ${devnum}:${distro_bootpart} "           \
+ 			"${scriptaddr} ${prefix}${script}; "              \
+@@ -365,6 +389,7 @@
+ 		"echo Scanning ${devtype} "                               \
+ 				"${devnum}:${distro_bootpart}...; "       \
+ 		"for prefix in ${boot_prefixes}; do "                     \
++			"run scan_dev_for_uenv; "                         \
+ 			"run scan_dev_for_extlinux; "                     \
+ 			"run scan_dev_for_scripts; "                      \
+ 		"done;"                                                   \
+diff -Nur uboot-2016.11.orig/include/configs/vexpress_common.h uboot-2016.11/include/configs/vexpress_common.h
+--- uboot-2016.11.orig/include/configs/vexpress_common.h	2017-01-27 05:06:07.007679923 +0100
++++ uboot-2016.11/include/configs/vexpress_common.h	2017-02-01 13:31:00.806464621 +0100
+@@ -206,7 +206,8 @@
+ 		"maxramdisk=0x1800000\0" \
+ 		"pxefile_addr_r=0x88000000\0" \
+ 		"scriptaddr=0x88000000\0" \
+-		"kernel_addr_r=0x80008000\0"
++		"kernel_addr_r=0x60008000\0" \
++		"fdt_addr_r=0x67f00000\0"
+ #elif defined(CONFIG_VEXPRESS_EXTENDED_MEMORY_MAP)
+ #define CONFIG_PLATFORM_ENV_SETTINGS \
+ 		"loadaddr=0xa0008000\0" \
+@@ -221,7 +222,7 @@
+ #define CONFIG_EXTRA_ENV_SETTINGS \
+ 		CONFIG_PLATFORM_ENV_SETTINGS \
+                 BOOTENV \
+-		"console=ttyAMA0,38400n8\0" \
++		"console=ttyAMA0,115200 \0" \
+ 		"dram=1024M\0" \
+ 		"root=/dev/sda1 rw\0" \
+ 		"mtd=armflash:1M@0x800000(uboot),7M@0x1000000(kernel)," \
